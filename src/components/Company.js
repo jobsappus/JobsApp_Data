@@ -95,7 +95,7 @@ export default function Company() {
 												</td>
 												<td className="relative whitespace-nowrap py-4 pl-5 pr-4 text-right text-sm font-medium sm:pr-0">
 													<Link
-														to={`/company/edit/${'as'}`}
+														to={`/company/edit/${company.companyId}`}
 														className="text-indigo-600 hover:text-indigo-900"
 													>
 														Edit

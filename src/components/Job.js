@@ -1,6 +1,6 @@
 import url from '../url'
 import React, { useState, useEffect, useContext } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import Axios from 'axios'
 import Container from './Container'
 

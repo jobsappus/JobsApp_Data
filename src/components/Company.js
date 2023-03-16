@@ -1,6 +1,7 @@
 import url from '../url';
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import DropDown from './DropDown';
 import Axios from 'axios';
 
 export default function Company() {
@@ -35,6 +36,17 @@ export default function Company() {
 							<p className="mt-2 text-sm text-gray-700">
 								A list of all the Companies.
 							</p>
+						</div>
+						{/* <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+							<DropDown />
+						</div> */}
+						<div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+							<Link
+								to="/job"
+								className="block rounded-md bg-indigo-600 py-2 px-3 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+							>
+								View Jobs
+							</Link>
 						</div>
 						<div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
 							<Link

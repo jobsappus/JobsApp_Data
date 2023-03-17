@@ -1,80 +1,116 @@
-import { Fragment, useState } from 'react';
-import { Listbox, Transition } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/20/solid';
+// import React from 'react';
+// import Select from 'react-select';
 
-const publishingOptions = [10, 20, 30, 50, 100, 'All'];
+// const aquaticCreatures = [
+// 	{ label: 'Shark', value: 'Shark' },
+// 	{ label: 'Dolphin', value: 'Dolphin' },
+// 	{ label: 'Whale', value: 'Whale' },
+// 	{ label: 'Octopus', value: 'Octopus' },
+// 	{ label: 'Crab', value: 'Crab' },
+// 	{ label: 'Lobster', value: 'Lobster' },
+// ];
+
+// export default function DropDown(props) {
+// 	return (
+// 		<div className="App">
+// 			<Select
+// 				options={aquaticCreatures}
+// 				onChange={opt => console.log(opt.label, opt.value)}
+// 			/>
+// 		</div>
+// 	);
+// }
+
+import { useState } from 'react';
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
+import { Combobox } from '@headlessui/react';
 
 function classNames(...classes) {
 	return classes.filter(Boolean).join(' ');
 }
 
-export default function Example() {
-	const [selected, setSelected] = useState(publishingOptions[0]);
+export default function Example(props) {
+	const totalPages = Array.from({ length: props.totalPages }, (_, i) => i + 1);
+	const [query, setQuery] = useState('');
 
+	const filteredPages =
+		query === ''
+			? totalPages
+			: totalPages.filter(page => {
+					const pages = page.toString();
+					return pages.includes(query);
+			  });
+	// console.log(filteredPages);
+
+	// return <h1>dwiq</h1>;
 	return (
-		<Listbox value={selected} onChange={setSelected}>
-			{({ open }) => (
-				<>
-					<Listbox.Label className="sr-only">
-						Change published status
-					</Listbox.Label>
-					<div className="relative">
-						<div className="inline-flex divide-x divide-indigo-700 rounded-md shadow-sm">
-							<div className="inline-flex items-center gap-x-1.5 rounded-l-md bg-indigo-600 py-2 px-3 text-white shadow-sm">
-								<p className="text-sm font-semibold">{selected}</p>
-							</div>
-							<Listbox.Button className="inline-flex items-center rounded-l-none rounded-r-md bg-indigo-600 p-2 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 focus:ring-offset-gray-50">
-								<span className="sr-only">Change published status</span>
-								<ChevronDownIcon
-									className="h-5 w-5 text-white"
-									aria-hidden="true"
-								/>
-							</Listbox.Button>
-						</div>
+		<Combobox
+			as="div"
+			value={props.currentPage + 1}
+			onChange={props.setCurrentPage}
+			className="w-20"
+		>
+			<div className="relative">
+				<Combobox.Input
+					className="rounded-md border-0 bg-white py-1.5 pl-3 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 w-full"
+					onChange={event => setQuery(event.target.value)}
+					displayValue={page => page}
+				/>
+				<Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
+					<ChevronUpDownIcon
+						className="h-5 w-5 text-gray-400"
+						aria-hidden="true"
+					/>
+				</Combobox.Button>
 
-						<Transition
-							show={open}
-							as={Fragment}
-							leave="transition ease-in duration-100"
-							leaveFrom="opacity-100"
-							leaveTo="opacity-0"
-						>
-							<Listbox.Options className="absolute right-0 z-10 mt-2 w-72 origin-top-right divide-y divide-gray-200 overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-								{publishingOptions.map(option => (
-									<Listbox.Option
-										key={option.title}
-										className={({ active }) =>
-											classNames(
-												active
-													? 'bg-indigo-600 text-white'
-													: 'text-gray-900',
-												'cursor-default select-none p-4 text-sm'
-											)
-										}
-										value={option}
-									>
-										{({ selected, active }) => (
-											<div className="flex flex-col">
-												<div className="flex justify-between">
-													<p
-														className={
-															selected
-																? 'font-semibold'
-																: 'font-normal'
-														}
-													>
-														{option + ' ' + 'results'}
-													</p>
-												</div>
-											</div>
+				{filteredPages.length > 0 && (
+					<Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+						{filteredPages.map(page => (
+							<Combobox.Option
+								key={page}
+								value={page}
+								className={({ active }) =>
+									classNames(
+										'relative cursor-default select-none py-2 pl-3 pr-9',
+										active
+											? 'bg-indigo-600 text-white'
+											: 'text-gray-900'
+									)
+								}
+							>
+								{({ active, selected }) => (
+									<>
+										<div className="flex">
+											<span
+												className={classNames(
+													'truncate',
+													selected && 'font-semibold'
+												)}
+											>
+												{page}
+											</span>
+										</div>
+
+										{selected && (
+											<span
+												className={classNames(
+													'absolute inset-y-0 right-0 flex items-center pr-4',
+													active ? 'text-white' : 'text-indigo-600'
+												)}
+											>
+												<CheckIcon
+													className="h-5 w-5"
+													aria-hidden="true"
+												/>
+											</span>
 										)}
-									</Listbox.Option>
-								))}
-							</Listbox.Options>
-						</Transition>
-					</div>
-				</>
-			)}
-		</Listbox>
+									</>
+								)}
+							</Combobox.Option>
+						))}
+					</Combobox.Options>
+				)}
+			</div>
+		</Combobox>
 	);
 }

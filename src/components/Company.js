@@ -1,19 +1,22 @@
 import url from '../url';
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import DropDown from './DropDown';
+import Pagination from './Pagination';
 import Axios from 'axios';
 
 export default function Company() {
 	const [companies, setCompanies] = useState([]);
+	const [currentPage, setCurrentPage] = useState(0);
+	const [totalPages, setTotalPages] = useState(0);
 
 	useEffect(() => {
 		const ourRequest = Axios.CancelToken.source();
 		async function fetchResults() {
 			try {
 				const response = await Axios.get(`${url}/api/v1/companies`);
-				// console.log(response.data)
 				setCompanies(response.data.data.sort((a, b) => b.h1b - a.h1b));
+				// localStorage.setItem('data', JSON.stringify(response.data.data));
+				setTotalPages(parseInt(response.data.data.length / 10));
 			} catch (e) {
 				console.log('There was a problem or the request was cancelled.');
 			}
@@ -37,9 +40,6 @@ export default function Company() {
 								A list of all the Companies.
 							</p>
 						</div>
-						{/* <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-							<DropDown />
-						</div> */}
 						<div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
 							<Link
 								to="/job"
@@ -57,6 +57,11 @@ export default function Company() {
 							</Link>
 						</div>
 					</div>
+					<Pagination
+						setCurrentPage={setCurrentPage}
+						currentPage={currentPage}
+						totalPages={totalPages}
+					/>
 					<div className="mt-8 flow-root">
 						<div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
 							<div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
@@ -90,31 +95,33 @@ export default function Company() {
 										</tr>
 									</thead>
 									<tbody className="divide-y divide-gray-200">
-										{companies.map(company => (
-											<tr key={company.companyId}>
-												<td className="whitespace-nowrap py-4 pl-4 px-3 text-sm font-medium text-gray-900 sm:pl-0">
-													<img
-														className="h-20 w-20 rounded-full"
-														src={company.logo}
-														alt=""
-													/>
-												</td>
-												<td className="py-4 px-3 text-sm text-gray-500">
-													{company.name}
-												</td>
-												<td className="whitespace-nowrap py-4 px-3 text-sm text-gray-500">
-													{company.h1b}
-												</td>
-												<td className="relative whitespace-nowrap py-4 pl-5 pr-4 text-right text-sm font-medium sm:pr-0">
-													<Link
-														to={`/company/edit/${company.companyId}`}
-														className="text-indigo-600 hover:text-indigo-900"
-													>
-														Edit
-													</Link>
-												</td>
-											</tr>
-										))}
+										{companies
+											.slice(currentPage * 10, currentPage * 10 + 10)
+											.map(company => (
+												<tr key={company.companyId}>
+													<td className="whitespace-nowrap py-4 pl-4 px-3 text-sm font-medium text-gray-900 sm:pl-0">
+														<img
+															className="h-20 w-20 rounded-full"
+															src={company.logo}
+															alt=""
+														/>
+													</td>
+													<td className="py-4 px-3 text-sm text-gray-500">
+														{company.name}
+													</td>
+													<td className="whitespace-nowrap py-4 px-3 text-sm text-gray-500">
+														{company.h1b}
+													</td>
+													<td className="relative whitespace-nowrap py-4 pl-5 pr-4 text-right text-sm font-medium sm:pr-0">
+														<Link
+															to={`/company/edit/${company.companyId}`}
+															className="text-indigo-600 hover:text-indigo-900"
+														>
+															Edit
+														</Link>
+													</td>
+												</tr>
+											))}
 									</tbody>
 								</table>
 							</div>

@@ -46,9 +46,9 @@ export default function Example(props) {
 	return (
 		<Combobox
 			as="div"
-			value={props.currentPage + 1}
+			value={props.currentPage}
 			onChange={props.setCurrentPage}
-			className="w-20"
+			className="w-24"
 		>
 			<div className="relative">
 				<Combobox.Input

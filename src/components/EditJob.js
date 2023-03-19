@@ -2,60 +2,39 @@ import url from '../url'
 import React, { useState, useEffect, useContext } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import Axios from 'axios'
+import Select from 'react-select'
 
 import Container from './Container'
 import DatePicker from 'react-datepicker'
+import CompanyDropDown from './companyDropDown'
 import 'react-datepicker/dist/react-datepicker.css'
 import { ArrowLeftIcon } from '@heroicons/react/20/solid'
 
 import StateContext from '../StateContext'
 import DispatchContext from '../DispatchContext'
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
-*/
+
 export default function EditJob() {
+	const Domains = [
+		{ label: 'Software', value: 'Software' },
+		{ label: 'Data', value: 'Data' },
+		{ label: 'Security', value: 'Security' },
+		{ label: 'Cloud', value: 'Cloud' },
+		{ label: 'Devops', value: 'Devops' }
+	]
+
 	const [uploading, setUploading] = useState(false)
 	const [selectedDate, setSelectedDate] = useState(new Date())
-	const [companies, setCompanies] = useState([])
 	const [jobTitle, setJobTitle] = useState('')
 	const [jobLink, setJobLink] = useState('')
 	const [jobType, setJobType] = useState('')
 	const [jobDesc, setJobDesc] = useState('')
 	const [companyId, setCompanyId] = useState('')
-	// const [again, setAgain] = useState(0)
+	const [domain, setDomain] = useState('')
+
 	const appState = useContext(StateContext)
 	const appDispatch = useContext(DispatchContext)
 	const navigate = useNavigate()
 	const id = useParams().id
-
-	useEffect(() => {
-		async function fetchData() {
-			const response = await Axios.get(`${url}/api/v1/companies`)
-			const companies = response.data.data
-			companies.sort((a, b) => {
-				if (a.name < b.name) {
-					return -1
-				}
-				if (a.name > b.name) {
-					return 1
-				}
-				return 0
-			})
-			setCompanies(companies)
-		}
-		fetchData()
-	}, [])
 
 	useEffect(() => {
 		if (!appState.loggedIn) {
@@ -78,6 +57,7 @@ export default function EditJob() {
 			setJobDesc(job.jobDesc)
 			setSelectedDate(new Date(job.jobPostedDate))
 			setCompanyId(job.companyId)
+			setDomain(job.jobDomain)
 		}
 		fetchData()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -122,7 +102,7 @@ export default function EditJob() {
 			})
 		}
 	}
-
+	// console.log(companyId)
 	return (
 		<>
 			<Container>
@@ -249,42 +229,40 @@ export default function EditJob() {
 												</select>
 											</div>
 											{/* {compnay} */}
+											<div className="col-span-8 sm:col-span-4">
+												<label
+													htmlFor="company"
+													className="block text-sm font-medium leading-6 mb-2 text-gray-900"
+												>
+													Company
+												</label>
+												<CompanyDropDown
+													value={companyId}
+													onChange={setCompanyId}
+												/>
+											</div>
+											<div className="col-span-2 sm:col-span-2 flex justify-start pt-8">
+												<Link
+													className="rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+													to="/company/add"
+												>
+													Add Company
+												</Link>
+											</div>
 											<div className="col-span-6">
 												<label
 													htmlFor="company"
 													className="block text-sm font-medium leading-6 text-gray-900"
 												>
-													Company
+													Domains
 												</label>
-												<select
-													id="company"
-													name="company"
-													autoComplete="company-name"
-													className="mt-2 rounded-md border-0 mr-5 bg-white p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-													style={{ width: '60%' }}
-													value={companyId}
-													onChange={event =>
-														setCompanyId(event.target.value)
-													}
-												>
-													<option>--select--</option>
-													{companies.map(company => (
-														<option
-															value={company.companyId}
-															key={company.companyId}
-														>
-															{company.name}
-														</option>
-													))}
-												</select>
-												<Link
-													className="rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-													to="/company/add"
-												>
-													Add a Company
-												</Link>
+												<Select
+													options={Domains}
+													isMulti={true}
+													value={domain}
+													onChange={opt => setDomain(opt)}
+												/>
 											</div>
-
 											{/* {Description} */}
 											<div className="col-span-6">
 												<label
@@ -308,18 +286,18 @@ export default function EditJob() {
 												</div>
 											</div>
 										</div>
+										<div className="bg-gray-50 px-4 py-3 text-right sm:px-6">
+											<button
+												type="submit"
+												className="inline-flex justify-center rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+												onClick={handleSubmit}
+											>
+												{uploading ? 'Updating ...' : 'Update'}
+											</button>
+										</div>
 									</div>
 								</div>
 								{/* {submit} */}
-								<div className="bg-gray-50 px-4 py-3 text-right sm:px-6">
-									<button
-										type="submit"
-										className="inline-flex justify-center rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-										onClick={handleSubmit}
-									>
-										{uploading ? 'Updating ...' : 'Update'}
-									</button>
-								</div>
 							</form>
 						</div>
 					</div>
